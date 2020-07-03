@@ -1,60 +1,82 @@
-<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
+<!-- HTML for static distribution bundle build -->
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="dist/swagger-ui.css" >
-    <link rel="icon" type="image/png" href="dist/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="dist/favicon-16x16.png" sizes="16x16" />
-    <style>
-      html
-      {
-        box-sizing: border-box;
-        overflow: -moz-scrollbars-vertical;
-        overflow-y: scroll;
-      }
+    <title>CoinAPI Documentation</title>
+  <style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: Roboto,sans-serif;
+    font-size: 9px;
+    line-height: 1.42857143;
+    color: #444;
+    margin: 0px;
+  }
 
-      *,
-      *:before,
-      *:after
-      {
-        box-sizing: inherit;
-      }
+  #swagger-editor {
+    font-size: 1.3em;
+  }
 
-      body
-      {
-        margin:0;
-        background: #fafafa;
-      }
-    </style>
-  </head>
+  .container {
+    height: 100%;
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-  <body>
-    <div id="swagger-ui"></div>
+  #editor-wrapper {
+    height: 100%;
+    border:1em solid #000;
+    border:none;
+  }
 
-    <script src="dist/swagger-ui-bundle.js"> </script>
-    <script src="dist/swagger-ui-standalone-preset.js"> </script>
-    <script>
-    window.onload = function() {
-      // Begin Swagger UI call region
-      const ui = SwaggerUIBundle({
-        url: "swagger.yaml",
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout"
-      })
-      // End Swagger UI call region
+  .Pane1 {
+    display: none;
+  }
 
-      window.ui = ui
-    }
+  .SplitPane {
+    position: relative !important;
+    display: block !important;
+  }
+
+  .Pane2 {
+    overflow-y: auto;
+    width: 100% !important;
+  }
+
+  .info .main .link {
+    display: none;
+  }
+
+  </style>
+  <link rel="stylesheet" type="text/css" href="dist/swagger-editor.css" >
+  <link rel="icon" type="image/png" href="dist/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="dist/favicon-16x16.png" sizes="16x16" />
+</head>
+
+<body>
+  <div id="swagger-editor"></div>
+  <script src="./dist/swagger-editor-bundle.js"> </script>
+  <script src="./dist/swagger-editor-standalone-preset.js"> </script>
+  <script>
+  window.onload = function() {
+    // Build a system
+    const editor = SwaggerEditorBundle({
+      dom_id: '#swagger-editor',
+      layout: 'StandaloneLayout',
+      url: './swagger.yaml',
+      presets: [
+        SwaggerEditorStandalonePreset
+      ],
+      defaultModelsExpandDepth: -1,
+    })
+    
+    window.editor = editor
+  }
+
   </script>
   </body>
 </html>
