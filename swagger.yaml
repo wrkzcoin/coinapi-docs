@@ -102,11 +102,28 @@ paths:
                   transactions:
                     type: array
                     items:
-                      $ref: '#/definitions/Transaction'
+                      properties:
+                        coin:
+                          type: string
+                          example: WRKZ
+                        realAmount:
+                          type: number
+                          format: float
+                          example: 1222.11
+                        txInOut:
+                          type: string
+                          example: IN
+                        timestamp:
+                          type: number
+                          format: uint64
+                          example: 1593755048
+                        txHash:
+                          type: string
+                          example: e1d1708223e653ee0b9344ff5618eafe19d945f39fa9176caba9f1a8ab8352af
         '401':
-          $ref: '#/responses/UnauthorizedError'
+          description: API key is missing or invalid.
         '500':
-          $ref: '#/responses/InternalError'
+          description: The operation completed successfully.
 
   /transactions/send:
     post:
@@ -142,7 +159,7 @@ paths:
                     type: string
                     description: The payment ID to use (if supported by a coin)
                     example: >-
-                              38a8224a4c8bc5f060555cf9e89551dcd0cbb1c587a52b63e98f71280c362ee4
+                      38a8224a4c8bc5f060555cf9e89551dcd0cbb1c587a52b63e98f71280c362ee4
       responses:
         '201':
           description: The operation completed successfully.
@@ -160,89 +177,13 @@ paths:
                     format: float
                     example: 10.00
         '400':
-          $ref: '#/responses/BadRequest'
+          description: API key is missing or invalid.
         '401':
-          $ref: '#/responses/UnauthorizedError'
+          description: API key is missing or invalid.
         '500':
-          $ref: '#/responses/InternalError'
-
-
-definitions:
-  SendTransaction:
-    type: object
-    required:
-      - coin
-      - address
-      - realAmount
-    properties:
-      coin:
-        type: string
-        description: Name of a supported coin in CoinAPI
-        example: WRKZ
-      address:
-        type: string
-        description: The address to send funds to
-        example: >-
-          WrkzRNDQDwFCBynKPc459v3LDa1gEGzG3j962tMUBko1fw9xgdaS9mNiGMgA9s1q7hS1Z8SGRVWzcGc8Sh8xsvfZ6u2wJEtoZB
-      realAmount:
-        type: number
-        format: float
-        description: The amount of WRKZ to send (in real unit)
-        example: 1234.56
-      paymentID:
-        type: string
-        description: The payment ID to use (if supported by a coin)
-        example: >-
-                  38a8224a4c8bc5f060555cf9e89551dcd0cbb1c587a52b63e98f71280c362ee4
-  Transaction:
-    type: object
-    properties:
-      coin:
-        type: string
-        example: WRKZ
-      realAmount:
-        type: number
-        format: float
-        example: 1222.11
-      txInOut:
-        type: string
-        example: IN
-      timestamp:
-        type: number
-        format: uint64
-        example: 1593755048
-      txHash:
-        type: string
-        example: e1d1708223e653ee0b9344ff5618eafe19d945f39fa9176caba9f1a8ab8352af
-responses:
-  UnauthorizedError:
-    description: API key is missing or invalid.
-  Success:
-    description: The operation completed successfully.
-  BadRequest:
-    description: 'A parse error occured, or an error occured processing your request.'
-    schema:
-      type: object
-      properties:
-        errorCode:
-          type: integer
           description: >-
-            A numeric code representing the error, for programmatic use. Error
-            code mappings can be found here -
-            https://github.com/wrkzcoin/wrkzcoin/blob/development/src/errors/Errors.h
-            We will endeavour to not change these mappings.
-          example: 5
-        errorMessage:
-          type: string
-          description: >-
-            A human readable error message, for displaying to the user. It is
-            suggested for programmers to not pattern match on these, and instead
-            use the errorCode.
-          example: The password given for this wallet is incorrect.
-  InternalError:
-    description: >-
-      An exception was thrown whilst processing the request. See the console for
-      logs.
+            An exception was thrown whilst processing the request. See the console for logs.
+
 components:
   schemas:
     Info:
