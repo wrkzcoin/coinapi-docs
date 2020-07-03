@@ -34,6 +34,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
+
   '/info/{coin}':
     get:
       summary: Retrieves information regarding a specific coin information and its status
@@ -57,6 +58,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
+
   /balances:
     get:
       summary: Get the balance for every coin
@@ -78,7 +80,7 @@ paths:
 
   '/balances/{coin}':
     get:
-      summary: Get the balance for a defined coin
+      summary: Get the balance for a selected coin
       parameters:
         - name: coin
           description: Supported coin name by CoinAPI
@@ -101,9 +103,40 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalError'
-  '/deposit/{coin}':
+
+  /deposits:
     get:
-      summary: Retrieves a deposit address (or with paymentID) of a coin supported by CoinAPI
+      summary: Get a list of deposit addresses
+      tags:
+        - Private Query
+      responses:
+        '200':
+          description: The operation completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addresses:
+                    type: array
+                    items:
+                      properties:
+                        coin:
+                          type: string
+                          example: WRKZ
+                        address:
+                          type: string
+                          example: WrkzhgkBTzSMSiLqfSSe3t7irHdgvE3jxTh4CMJR6vUzWY9eartiFudXzGFf56MVtAdFqJTXBaMsjScCMnMxKpY39Hx12SHM18
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  '/deposits/{coin}':
+    get:
+      summary: Retrieves a deposit address (or with paymentID) of a selected coin
       parameters:
         - name: coin
           description: Supported coin name by CoinAPI
@@ -126,6 +159,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalError'
+
   /transactions:
     get:
       summary: Gets a list of all your transactions
@@ -160,6 +194,55 @@ paths:
                         txHash:
                           type: string
                           example: e1d1708223e653ee0b9344ff5618eafe19d945f39fa9176caba9f1a8ab8352af
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  '/transactions/{coin}':
+    get:
+      summary: Gets a list of all your transactions of a selected coin
+      parameters:
+        - name: coin
+          description: Supported coin name by CoinAPI
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - Private Query
+      responses:
+        '200':
+          description: The operation completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      properties:
+                        coin:
+                          type: string
+                          example: BTCMZ
+                        realAmount:
+                          type: number
+                          format: float
+                          example: 111.11
+                        txInOut:
+                          type: string
+                          example: IN
+                        timestamp:
+                          type: number
+                          format: uint64
+                          example: 1593755000
+                        txHash:
+                          type: string
+                          example: 036806e194ee49b9540d4ffecfb525c6d038675e1a5e25b8bc4d390692bbfcb9
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -169,7 +252,7 @@ paths:
 
   /transactions/send:
     post:
-      summary: Creates a transaction but does not relay it to the network
+      summary: Sending a transaction through coin network
       tags:
         - Private Query
       requestBody:
