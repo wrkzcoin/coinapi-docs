@@ -30,12 +30,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Info'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericError'
+          $ref: '#/components/responses/InternalError'
   '/info/{coin}':
     get:
       summary: Retrieves information regarding a specific coin information and its status
@@ -55,12 +53,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Info.Coin'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal Server Error
+          $ref: '#/components/responses/InternalError'
+  /balances:
+    get:
+      summary: Get the balance for every coin
+      tags:
+        - Private Query
+      responses:
+        '200':
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GenericError'
+                $ref: '#/components/schemas/Balances'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  '/balances/{coin}':
+    get:
+      summary: Get the balance for a defined coin
+      parameters:
+        - name: coin
+          description: Supported coin name by CoinAPI
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - Private Query
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance.Coin'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
   '/deposit/{coin}':
     get:
       summary: Retrieves a deposit address (or with paymentID) of a coin supported by CoinAPI
@@ -80,12 +120,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Deposit.Coin'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericError'
+          $ref: '#/components/responses/InternalError'
   /transactions:
     get:
       summary: Gets a list of all your transactions
@@ -120,10 +160,12 @@ paths:
                         txHash:
                           type: string
                           example: e1d1708223e653ee0b9344ff5618eafe19d945f39fa9176caba9f1a8ab8352af
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: API key is missing or invalid.
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: The operation completed successfully.
+          $ref: '#/components/responses/InternalError'
 
   /transactions/send:
     post:
@@ -180,15 +222,50 @@ paths:
                     format: float
                     example: 10.12
         '400':
-          description: API key is missing or invalid.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: API key is missing or invalid.
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: >-
-            An exception was thrown whilst processing the request. See the console for logs.
+          $ref: '#/components/responses/InternalError'
 
 components:
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: A parse error occured, or an error occured processing your request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: An exception was thrown whilst processing the request. See the console for logs. Please report.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+      # Schema for error response body
+    Error:
+      type: object
+      properties:
+        errorCode:
+          type: integer
+        errorMessage:
+          type: string
+      required:
+        - errorCode
+        - errorMessage
     Info:
       properties:
         status:
@@ -217,6 +294,10 @@ components:
           type: string
           description: Name of a coin in CoinAPI
           example: WRKZ
+        decimal:
+          type: number
+          description: Decimal number of a coin
+          example: 100
         height:
           type: number
           description: Height of a coin network
@@ -245,6 +326,34 @@ components:
           type: number
           description: Number of withdraw limit per last 24h.
           example: 200
+    Balances:
+      properties:
+        balances:
+          type: array
+          items:
+            properties:
+              coin:
+                type: string
+                description: Coin name
+                example: WRKZ
+              balance:
+                type: number
+                format: float
+                description: Real balance
+                example: 1111.22
+    Balance.Coin:
+      properties:
+        coin:
+          type: string
+          description: Name of a coin in CoinAPI
+          example: WRKZ
+        balance:
+          type: number
+          format: float
+          description: Coin balance
+          example: 111.22
+
+
     Deposit.Coin:
       properties:
         coin:
@@ -260,16 +369,3 @@ components:
           format: uint64
           description: Timestamp of generated address
           example: 1593757876
-    GenericError:
-      properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: number
-              description: The error code
-              example: 64
-            message:
-              type: string
-              description: A descriptive error
-              example: An internal error occurred.
